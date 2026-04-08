@@ -28,5 +28,5 @@ async def create_user(session: AsyncSession, data: UserCreate) -> User:
     user = User(email=data.email, password_hash=hash_pwd)
     session.add(user)
     await session.commit()
-    await session.refresh(user)  # разобраться
+    await session.refresh(user)
     return user
