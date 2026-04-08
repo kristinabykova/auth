@@ -2,6 +2,7 @@ from typing import Optional
 import uuid
 
 from fastapi import Depends, HTTPException, status, Cookie
+from fastapi.security import OAuth2PasswordBearer
 from jwt import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,8 @@ from crud import User
 from db.dependencies import get_session
 from crud import get_user_by_email, get_user_by_id
 from schemas import UserLogin
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 async def validate_auth_user(
@@ -37,7 +40,7 @@ async def validate_auth_user(
 
 
 async def get_current_user(
-    access_token: str | None = Cookie(None),
+    access_token: str | None = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> Optional[User]:
     if access_token is None:
