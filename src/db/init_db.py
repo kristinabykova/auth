@@ -1,6 +1,6 @@
 from session import engine
 from base import Base
-from user import User
+from crud import User
 
 
 async def init_db():
