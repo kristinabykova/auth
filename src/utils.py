@@ -5,6 +5,11 @@ import jwt
 import bcrypt
 
 from config import settings
+import uuid
+
+
+def generate_jti() -> str:
+    return str(uuid.uuid4())
 
 
 def encode_jwt(
@@ -20,7 +25,12 @@ def encode_jwt(
         expire = now + expire_delta
     else:
         expire = now + timedelta(minutes=expire_minutes)
-    to_encode.update(exp=expire, iat=now)
+    to_encode.update(
+        exp=expire,
+        iat=now,
+        jti=generate_jti(),
+        role=payload.get("role"),
+    )
     encoded = jwt.encode(to_encode, key, algorithm=algorithm)
     return encoded
 
