@@ -1,7 +1,6 @@
-from .session import engine
-from .base import Base
-from src.models.user import User
-from src.models.portfolio import Portfolio
+from session import engine
+from base import Base
+from user import User
 
 
 async def init_db():
