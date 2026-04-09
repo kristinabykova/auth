@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas import UserCreate
+from schemas.user import UserCreate
 from user import User
 from utils import hash_password
 

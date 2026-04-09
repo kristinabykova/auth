@@ -1,9 +1,9 @@
 from typing import Optional
 import uuid
 
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt import ExpiredSignatureError, InvalidTokenError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from utils import (
@@ -15,7 +15,7 @@ from utils import (
 )
 from db.dependencies import get_session
 from crud import User, get_user_by_email, get_user_by_id
-from schemas import UserLogin
+from schemas.user import UserLogin
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

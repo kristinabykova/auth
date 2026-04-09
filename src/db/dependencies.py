@@ -1,4 +1,4 @@
-from session import async_session_maker
+from .session import async_session_maker
 
 
 async def get_session():
