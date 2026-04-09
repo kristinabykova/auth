@@ -1,8 +1,11 @@
 from typing import Optional
 import uuid
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Header, status
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+)
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +20,8 @@ from db.dependencies import get_session
 from crud import User, get_user_by_email, get_user_by_id
 from schemas.user import UserLogin
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def validate_auth_user(
@@ -70,9 +74,16 @@ def validate_token_type(payload: dict, token_type: str) -> None:
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> Optional[User]:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No token",
+        )
+
+    token = credentials.credentials
     payload = get_token_payload(token)
     validate_token_type(payload, ACCESS_TOKEN_TYPE)
 
@@ -108,9 +119,16 @@ async def get_current_user(
 
 
 async def get_current_user_for_refresh(
-    token: str = Depends(oauth2_scheme),
+    authorization: str = Header(None),
     session: AsyncSession = Depends(get_session),
 ) -> Optional[User]:
+
+    if not authorization:
+        raise HTTPException(401, "No token")
+
+    token = authorization.replace("Bearer ", "")
+
+    payload = get_token_payload(token)
     payload = get_token_payload(token)
     validate_token_type(payload, REFRESH_TOKEN_TYPE)
 
