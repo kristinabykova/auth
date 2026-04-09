@@ -70,7 +70,7 @@ def validate_token_type(payload: dict, token_type: str) -> None:
 
 
 async def get_current_user(
-    token: str | None = Depends(oauth2_scheme),
+    token: str = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> Optional[User]:
     payload = get_token_payload(token)

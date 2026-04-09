@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
+from crud import create_user, get_user_by_email
 from utils import create_access_token, create_refresh_token, encode_jwt
 from service import get_current_user, get_current_user_for_refresh, validate_auth_user
 from db.dependencies import get_session
@@ -7,6 +8,20 @@ from schemas.user import UserLogin, UserRead, Token
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+
+@router.post("/register", response_model=UserRead)
+async def register_user(
+    data: UserLogin, session: AsyncSession = Depends(get_session)
+) -> UserRead:
+    exist = await get_user_by_email(session, data.email)
+    if exist:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with email already exists",
+        )
+    user = await create_user(session, data)
+    return user
 
 
 @router.post("/login", response_model=Token)
