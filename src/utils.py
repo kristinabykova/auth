@@ -7,6 +7,9 @@ import bcrypt
 from config import settings
 import uuid
 
+ACCESS_TOKEN_TYPE = "access"
+REFRESH_TOKEN_TYPE = "refresh"
+
 
 def generate_jti() -> str:
     return str(uuid.uuid4())
@@ -29,7 +32,6 @@ def encode_jwt(
         exp=expire,
         iat=now,
         jti=generate_jti(),
-        role=payload.get("role"),
     )
     encoded = jwt.encode(to_encode, key, algorithm=algorithm)
     return encoded
@@ -42,6 +44,27 @@ def decode_jwt(
 ) -> dict[str, Any]:
     decoded = jwt.decode(token, key, algorithms=algorithm)
     return decoded
+
+
+def create_access_token(user) -> str:
+    payload = {
+        "sub": str(user.id),
+        "role": user.role,
+        "type": ACCESS_TOKEN_TYPE,
+    }
+    return encode_jwt(payload=payload)
+
+
+def create_refresh_token(user) -> str:
+    payload = {
+        "sub": str(user.id),
+        "role": user.role,
+        "type": REFRESH_TOKEN_TYPE,
+    }
+    return encode_jwt(
+        payload=payload,
+        expire_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+    )
 
 
 def hash_password(password: str) -> bytes:

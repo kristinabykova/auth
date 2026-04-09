@@ -8,5 +8,5 @@ class User(Base):
     email: Mapped[str_255] = mapped_column(unique=True)
     password_hash: Mapped[str_255]
     is_active: Mapped[bool] = mapped_column(default=True)
-    role: Mapped[str_255]
+    role: Mapped[str_255] = mapped_column(default="role1")
     created_at: Mapped[created_time]

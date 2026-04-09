@@ -16,6 +16,7 @@ class UserRead(BaseModel):
     id: UUID
     email: EmailStr
     is_active: bool
+    role: str
     created_at: datetime
 
     model_config = ConfigDict(strict=True)
