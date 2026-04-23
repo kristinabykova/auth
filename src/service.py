@@ -119,16 +119,16 @@ async def get_current_user(
 
 
 async def get_current_user_for_refresh(
-    authorization: str = Header(None),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> Optional[User]:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No token",
+        )
 
-    if not authorization:
-        raise HTTPException(401, "No token")
-
-    token = authorization.replace("Bearer ", "")
-
-    payload = get_token_payload(token)
+    token = credentials.credentials
     payload = get_token_payload(token)
     validate_token_type(payload, REFRESH_TOKEN_TYPE)
 
